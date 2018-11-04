@@ -1,5 +1,14 @@
 package cli
 
+// Error text for invalid/missing args
+const (
+	ExecAndFileMutualExclusive = "The 'e' flag and 'f' flag are mutually exclusive."
+	ServerRequired             = "The 's' flag (server) is required."
+	DatabaseRequired           = "The 'd' flag (database) is required."
+	UserNameRequired           = "The 'u' flag (user) is required."
+	PasswordRequired           = "The 'p' flag (password) is required."
+)
+
 // CmdLineArgs represents a parsed and validated set of
 // command line arguemnts from when the app was launched.
 type CmdLineArgs struct {
@@ -8,9 +17,9 @@ type CmdLineArgs struct {
 	Username   string
 	Server     string
 	Password   string
-	ExecuteCmd *string
-	Filename   *string
-	ReadWrite  bool
+	ExecuteCmd string
+	Filename   string
+	readWrite  bool
 	Errors     []string
 }
 
@@ -25,34 +34,46 @@ func (c *CmdLineArgs) ShowHelp() bool {
 	return c.help
 }
 
+// ReadWrite indicates if the connection should allow CRUD and DML statements.
+func (c *CmdLineArgs) ReadWrite() bool {
+	return c.readWrite
+}
+
 // ParseFlags validates the cli flags and returns a type of CmdLineArgs.
-func ParseFlags(dbn, hlp, usr, svr, pwd, exe, fln, rwr *string) (cla CmdLineArgs) {
-	cla.help = hlp != nil
+func ParseFlags(svr, dbn, usr, pwd, exe, fln string, hlp, rwr bool) (cla CmdLineArgs) {
+	cla.help = hlp || (svr == "" && dbn == "" && usr == "" && pwd == "" && exe == "" && fln == "" && !rwr)
 
 	if cla.help {
 		return
 	}
 
-	cla.Database = *dbn
+	cla.Server = svr
+	cla.Database = dbn
+	cla.Username = usr
+	cla.Password = pwd
 	cla.ExecuteCmd = exe
 	cla.Filename = fln
 	cla.Errors = make([]string, 0)
-	cla.ReadWrite = rwr != nil
+	cla.readWrite = rwr
 
-	if exe != nil && fln != nil {
-		cla.Errors = append(cla.Errors, "The 'e' flag and 'f' flag are mutually exclusive.")
+	if exe != "" && fln != "" {
+		cla.Errors = append(cla.Errors, ExecAndFileMutualExclusive)
 	}
 
-	if svr == nil {
-		cla.Errors = append(cla.Errors, "The 's' flag (server) is required.")
+	if svr == "" {
+		cla.Errors = append(cla.Errors, ServerRequired)
 	}
 
-	if usr == nil {
-		cla.Errors = append(cla.Errors, "The 'u' flag (user) is required.")
+	if dbn == "" {
+		cla.Errors = append(cla.Errors, DatabaseRequired)
 	}
 
-	if pwd == nil {
-		cla.Errors = append(cla.Errors, "The 'p' flag (password) is required.")
+	if usr == "" {
+		cla.Errors = append(cla.Errors, UserNameRequired)
+	}
+
+	if pwd == "" {
+		cla.Errors = append(cla.Errors, PasswordRequired)
 	}
 	return
 }
