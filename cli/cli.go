@@ -1,5 +1,12 @@
 package cli
 
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
+
 // Error text for invalid/missing args
 const (
 	ExecAndFileMutualExclusive = "The 'e' flag and 'f' flag are mutually exclusive."
@@ -7,6 +14,8 @@ const (
 	DatabaseRequired           = "The 'd' flag (database) is required."
 	UserNameRequired           = "The 'u' flag (user) is required."
 	PasswordRequired           = "The 'p' flag (password) is required."
+
+	prompt = "tsqlsh"
 )
 
 // CmdLineArgs represents a parsed and validated set of
@@ -76,4 +85,27 @@ func ParseFlags(svr, dbn, usr, pwd, exe, fln string, hlp, rwr bool) (cla CmdLine
 		cla.Errors = append(cla.Errors, PasswordRequired)
 	}
 	return
+}
+
+// BuildCommand is used capture the sql command
+// to be executed.
+func BuildCommand() string {
+	var sb strings.Builder
+
+	for {
+		fmt.Print(prompt + "> ")
+		reader := bufio.NewReader(os.Stdin)
+		stmt, _ := reader.ReadString('\n')
+		sb.WriteString(stmt + "\n")
+
+		gocmd := strings.ToUpper(stmt[:len(stmt)-2])
+
+		if gocmd == "GO" {
+			break
+		}
+	}
+
+	sql := sb.String()
+	fmt.Print(sql)
+	return sql
 }

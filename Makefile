@@ -16,7 +16,9 @@ test:
 		$(GOTEST) -v ./...
 clean: 
 		$(GOCLEAN)
-		rm -rf bin/*
+		rm -rf bin/linux/*
+		rm -rf bin/darwin/*
+		rm -rf bin/win/*
 run:
 		$(GOBUILD) -o $(BINARY_NAME) -v ./...
 		./$(BINARY_NAME)   
@@ -25,8 +27,8 @@ run:
 build-linux: clean dep
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o bin/linux/$(BINARY) -v
 
-build-osx: clean dep
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GOBUILD) -o bin/osx/$(BINARY) -v
+build-darwin: clean dep
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GOBUILD) -o bin/darwin/$(BINARY) -v
 
 build-win: clean dep
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(GOBUILD) -o bin/win/$(BINARY).exe -v

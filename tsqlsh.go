@@ -22,15 +22,18 @@ var (
 
 func main() {
 	flag.Parse()
-	args := cli.ParseFlags(*svr, *dbn, *usr, *pwd, *exe, *fln, *hlp, *rwr)
+	//args := cli.ParseFlags(*svr, *dbn, *usr, *pwd, *exe, *fln, *hlp, *rwr)
 
-	switch {
-	case args.ShowHelp():
-		showUsage()
-	case args.HasErrors():
-		printErrors(args.Errors)
-		showUsage()
-	}
+	cli.BuildCommand()
+	// switch {
+	// case args.ShowHelp():
+	// 	showUsage()
+	// case args.HasErrors():
+	// 	printErrors(args.Errors)
+	// 	showUsage()
+	// default:
+	// 	cli.BuildCommand()
+	// }
 }
 
 // ShowUsage displays how tsqlsh should be called.
