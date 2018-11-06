@@ -96,10 +96,14 @@ func BuildCommand() string {
 		fmt.Print(prompt + "> ")
 		reader := bufio.NewReader(os.Stdin)
 		stmt, _ := reader.ReadString('\n')
+
+		excmd := strings.ToUpper(stmt[:len(stmt)-5])
+		gocmd := strings.ToUpper(stmt[:len(stmt)-2])
 		sb.WriteString(stmt + "\n")
 
-		gocmd := strings.ToUpper(stmt[:len(stmt)-2])
-
+		if excmd == "EXIT" {
+			return "exit"
+		}
 		if gocmd == "GO" {
 			break
 		}
