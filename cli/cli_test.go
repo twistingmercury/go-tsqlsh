@@ -120,3 +120,7 @@ func Test_ParseFlags_rw_flag_ReadWrite_is_true(t *testing.T) {
 	assert.Equal(t, "", args.Filename)
 	assert.Len(t, args.Errors, 0)
 }
+
+func Test_BuildCommand_exit_command(t *testing.T) {
+
+}

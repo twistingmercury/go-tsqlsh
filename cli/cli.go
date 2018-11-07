@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/twistingmercury/go-tsqlsh/terminal"
 )
 
 // Error text for invalid/missing args
@@ -89,27 +91,47 @@ func ParseFlags(svr, dbn, usr, pwd, exe, fln string, hlp, rwr bool) (cla CmdLine
 
 // BuildCommand is used capture the sql command
 // to be executed.
-func BuildCommand() string {
+func BuildCommand() (sql string, exit bool) {
 	var sb strings.Builder
+	fmt.Print(prompt + "> ")
 
 	for {
-		fmt.Print(prompt + "> ")
-		reader := bufio.NewReader(os.Stdin)
-		stmt, _ := reader.ReadString('\n')
+		cmd, exit, run, clear := ReadLine()
 
-		excmd := strings.ToUpper(stmt[:len(stmt)-5])
-		gocmd := strings.ToUpper(stmt[:len(stmt)-2])
-		sb.WriteString(stmt + "\n")
+		sb.WriteString(cmd)
 
-		if excmd == "EXIT" {
-			return "exit"
+		switch {
+		case exit:
+			return "", true
+		case run:
+			return sb.String(), false
+		case clear:
+			terminal.Clear()
+			fmt.Print(prompt + "> ")
+			continue
 		}
-		if gocmd == "GO" {
-			break
-		}
+
+		fmt.Print("    ... ")
+	}
+}
+
+// ReadLine reads in a single line from the terminal,
+func ReadLine() (cmd string, exit bool, run bool, clear bool) {
+	reader := bufio.NewReader(os.Stdin)
+	stmt, _ := reader.ReadString('\n')
+
+	switch {
+	case len(stmt) > 4 && strings.ToUpper(stmt[:len(stmt)-5]) == "EXIT":
+		exit = true
+	case len(stmt) > 4 && strings.ToUpper(stmt[:len(stmt)-5]) == "CLEAR":
+		clear = true
+	case len(stmt) > 1 && strings.ToUpper(stmt[:len(stmt)-2]) == "GO":
+		run = true
+	case stmt == "":
+		return
+	default:
+		cmd = stmt + "\n"
 	}
 
-	sql := sb.String()
-	fmt.Print(sql)
-	return sql
+	return
 }
