@@ -3,43 +3,38 @@ package dbaccess
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/denisenkom/go-mssqldb"
 	"net/url"
+
+	_ "github.com/denisenkom/go-mssqldb"
 )
 
 var (
 	defaultPort = 1433
 	defaultDb   = "master"
 	defaultHost = "localhost"
+	isMutable   = false
 )
 
-func BuildConStr(usr, pwd string, host, dbname *string, port *int, mutable *bool) (con string) {
-	if port == nil || *port == 0 {
-		port = &defaultPort
-	}
-
-	if dbname == nil || len(*dbname) == 0 {
-		dbname = &defaultDb
-	}
-
-	if host == nil || len(*host) == 0 {
-		host = &defaultHost
-	}
+/**
+BuildConStr is used to create a SQL Server, URL-formatted, connection string using the supplied
+values.
+*/
+func buildConStr(usr, pwd string, host, dbname string, port int, mutable bool) (con string) {
 
 	appIntent := "ReadOnly"
-	if mutable != nil && *mutable {
+	if mutable {
 		appIntent = "ReadWrite"
 	}
 
 	query := url.Values{}
 	query.Add("app name", "tsqlsh")
-	query.Add("database", *dbname)
+	query.Add("database", dbname)
 	query.Add("ApplicationIntent", appIntent)
 
 	u := &url.URL{
 		Scheme:   "sqlserver",
 		User:     url.UserPassword(usr, pwd),
-		Host:     fmt.Sprintf("%s:%d", *host, *port),
+		Host:     fmt.Sprintf("%s:%d", host, port),
 		RawQuery: query.Encode(),
 	}
 
@@ -52,8 +47,8 @@ func BuildConStr(usr, pwd string, host, dbname *string, port *int, mutable *bool
 Connect takes in the values provided and creates a URL format connection string
 to the target MSSQL server
 */
-func Connect(usr, pwd string, host, dbname *string, port *int, mutable *bool) (db *sql.DB, err error) {
-	cstr := BuildConStr(usr, pwd, host, dbname, port, mutable)
+func connect(usr, pwd string, host, dbname string, port int, mutable bool) (db *sql.DB, err error) {
+	cstr := buildConStr(usr, pwd, host, dbname, port, mutable)
 
 	db, err = sql.Open("sqlserver", cstr)
 

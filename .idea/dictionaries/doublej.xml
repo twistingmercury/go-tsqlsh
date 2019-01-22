@@ -6,6 +6,7 @@
       <w>sqlserver</w>
       <w>testdb</w>
       <w>tsqlsh</w>
+      <w>vals</w>
     </words>
   </dictionary>
 </component>
