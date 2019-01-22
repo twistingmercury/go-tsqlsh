@@ -11,15 +11,15 @@ dep:
 	dep ensure 
 
 all: test build
-build: build-linux
+build: build-osx
 test: 
 		$(GOTEST) -v ./...
 clean: 
 		$(GOCLEAN)
 		rm -rf bin/*
-run:
-		$(GOBUILD) -o $(BINARY_NAME) -v ./...
-		./$(BINARY_NAME)   
+
+run: build
+		./bin/osx/$(BINARY)
 
 # Cross compilation
 build-linux: clean dep
