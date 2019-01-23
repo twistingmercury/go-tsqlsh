@@ -1,5 +1,9 @@
 package cli
 
+import (
+	"errors"
+)
+
 // Error text for invalid/missing args
 const (
 	ExecAndFileMutualExclusive = "The 'e' flag and 'f' flag are mutually exclusive."
@@ -76,4 +80,8 @@ func ParseFlags(svr, dbn, usr, pwd, exe, fln string, hlp, rwr bool) (cla CmdLine
 		cla.Errors = append(cla.Errors, PasswordRequired)
 	}
 	return
+}
+
+func BuildCommand() (*string, error) {
+	return nil, errors.New("not implemented")
 }

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/twistingmercury/go-tsqlsh/cli"
 )
 
@@ -119,4 +120,18 @@ func Test_ParseFlags_rw_flag_ReadWrite_is_true(t *testing.T) {
 	assert.Equal(t, "", args.ExecuteCmd)
 	assert.Equal(t, "", args.Filename)
 	assert.Len(t, args.Errors, 0)
+}
+
+func Test_Build_Command_Simple_Query(t *testing.T) {
+	expected := "SELECT * FROM table;\nGO"
+	query, err := cli.BuildCommand()
+	assert.NoError(t, err)
+	assert.Equal(t, expected, query)
+}
+
+func Test_Build_Command_Exit(t *testing.T) {
+	expected := "exit"
+	query, err := cli.BuildCommand()
+	assert.NoError(t, err)
+	assert.Equal(t, expected, query)
 }
