@@ -1,4 +1,6 @@
 # Go parameters
+default: build
+
 GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
@@ -6,12 +8,8 @@ GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 BINARY=tsqlsh
 
-default: build
-dep: 
-	dep ensure 
-
-all: test build
 build: build-osx
+
 test: 
 		$(GOTEST) -v ./...
 clean: 
@@ -22,11 +20,11 @@ run: build
 		./bin/osx/$(BINARY)
 
 # Cross compilation
-build-linux: clean dep
+build-linux: clean 
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o bin/linux/$(BINARY) -v
 
-build-osx: clean dep
+build-osx: clean 
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GOBUILD) -o bin/osx/$(BINARY) -v
 
-build-win: clean dep
+build-win: clean 
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(GOBUILD) -o bin/win/$(BINARY).exe -v

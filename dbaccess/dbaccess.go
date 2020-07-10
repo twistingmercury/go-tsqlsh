@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
-
-	_ "github.com/denisenkom/go-mssqldb"
 )
 
 var (
